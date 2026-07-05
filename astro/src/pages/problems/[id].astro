@@ -1,0 +1,103 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { difficultyClass, difficultyLabel, getSiteData } from '../../lib/content';
+import { getSubmissionIssueUrl } from '../../site.config';
+
+export function getStaticPaths() {
+  return getSiteData().problems.map((problem) => ({
+    params: { id: problem.id }
+  }));
+}
+
+const data = getSiteData();
+const problem = data.problems.find((item) => item.id === Astro.params.id);
+
+if (!problem) {
+  throw new Error(`Unknown problem: ${Astro.params.id}`);
+}
+
+const stdSubmission = problem.std
+  ? problem.submissions.find((submission) => submission.user === problem.std)
+  : undefined;
+const submissionIssueUrl = getSubmissionIssueUrl(problem);
+const submitRecordUrl = submissionIssueUrl ?? `/submit/${problem.id}/`;
+---
+
+<BaseLayout title={problem.title}>
+  <section class="page-heading">
+    <div>
+      <p class="eyebrow">Problem / <code>{problem.id}</code></p>
+      <h1>{problem.title}</h1>
+    </div>
+    <div class="action-row">
+      {problem.submit && <a class="button-link primary" href={problem.submit}>评测入口</a>}
+      <a class="button-link secondary" href={submitRecordUrl}>提交做题记录</a>
+      <a class="button-link secondary" href="/problems/">返回列表</a>
+    </div>
+  </section>
+
+  <section class="meta-line">
+    <span class:list={['difficulty', difficultyClass(problem.difficulty)]}>{difficultyLabel(problem.difficulty)}</span>
+    {problem.tags.map((tag) => <span class="tag">{tag}</span>)}
+    {problem.dates.map((date) => <a class="tag neutral" href={`/daily/${date}/`}>{date}</a>)}
+    {problem.std && <a class="tag neutral" href={`/users/${problem.std}/`}>std: {problem.std}</a>}
+  </section>
+
+  <section class="panel">
+    <div class="section-title">
+      <h2>题面与提示</h2>
+    </div>
+    <article class="markdown" set:html={problem.html} />
+  </section>
+
+  {
+    stdSubmission?.displayAsSolution && (
+      <section class="panel">
+        <details class="fold">
+          <summary>
+            <span>标准题解</span>
+            <small>{stdSubmission.user}</small>
+          </summary>
+          <article class="markdown" set:html={stdSubmission.html} />
+        </details>
+      </section>
+    )
+  }
+
+  {
+    !stdSubmission?.displayAsSolution && problem.solutionHtml && (
+      <section class="panel">
+        <details class="fold">
+          <summary>
+            <span>题解</span>
+            <small>solution.md</small>
+          </summary>
+          <article class="markdown" set:html={problem.solutionHtml} />
+        </details>
+      </section>
+    )
+  }
+
+  <section class="panel">
+    <div class="section-title">
+      <h2>提交记录</h2>
+      <span>{problem.submissions.length} 条</span>
+    </div>
+    <div class="submission-list">
+      {
+        problem.submissions.map((submission) => (
+          <details class="submission-item">
+            <summary class="submission-row">
+              <span><a href={`/users/${submission.user}/`}>{submission.user}</a></span>
+              <span class="submission-actions">
+                {submission.record && <a href={submission.record}>提交记录</a>}
+                {submission.displayAsSolution && submission.raw && <span>查看题解</span>}
+              </span>
+            </summary>
+            {submission.displayAsSolution && submission.raw && <article class="markdown" set:html={submission.html} />}
+          </details>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

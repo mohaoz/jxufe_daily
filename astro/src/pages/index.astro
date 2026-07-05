@@ -1,0 +1,143 @@
+---
+import Heatmap from '../components/Heatmap.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { difficultyClass, difficultyLabel, getSiteData } from '../lib/content';
+
+const data = getSiteData();
+const topUsers = data.userSummaries.slice(0, 8);
+const recentDaily = [...data.dailyEntries].reverse().slice(0, 8);
+const recentSubmissions = [...data.submissions]
+  .sort((a, b) => String(b.date ?? '').localeCompare(String(a.date ?? '')) || a.user.localeCompare(b.user))
+  .slice(0, 10);
+---
+
+<BaseLayout title="训练记录总览">
+  <section class="page-heading">
+    <div>
+      <h1>训练记录总览</h1>
+    </div>
+  </section>
+
+  <section class="metric-grid" aria-label="站点统计">
+    <div class="metric">
+      <span class="metric-label">题目</span>
+      <strong>{data.stats.problemCount}</strong>
+    </div>
+    <div class="metric">
+      <span class="metric-label">训练日</span>
+      <strong>{data.stats.dailyCount}</strong>
+    </div>
+    <div class="metric">
+      <span class="metric-label">用户</span>
+      <strong>{data.stats.userCount}</strong>
+    </div>
+    <div class="metric">
+      <span class="metric-label">提交</span>
+      <strong>{data.stats.submissionCount}</strong>
+    </div>
+    <div class="metric">
+      <span class="metric-label">可展示题解</span>
+      <strong>{data.stats.displaySolutionCount}</strong>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="section-title">
+      <h2>排行榜</h2>
+      <span>最新训练日：{data.latestDate}</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>用户</th>
+            <th>当前连续</th>
+            <th>最长连续</th>
+            <th>训练天数</th>
+            <th>提交</th>
+            <th>可展示题解</th>
+            <th>近况</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            topUsers.map((summary) => (
+              <tr>
+                <td><a href={`/users/${summary.user}/`}>{summary.user}</a></td>
+                <td>{summary.currentStreak}</td>
+                <td>{summary.longestStreak}</td>
+                <td>{summary.totalTrainingDays}</td>
+                <td>{summary.totalSubmissions}</td>
+                <td>{summary.totalDisplaySolutions}</td>
+                <td class="heatmap-cell-table">
+                  <Heatmap
+                    dateCounts={summary.dateCounts}
+                    endDate={data.latestDate}
+                    scheduledDates={data.scheduledDates}
+                    compact
+                  />
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="content-grid">
+    <section class="panel">
+      <div class="section-title">
+        <h2>最近训练日</h2>
+        <a href="/daily/">全部日期</a>
+      </div>
+      <div class="list">
+        {
+          recentDaily.map((entry) => (
+            <a class="list-row" href={`/daily/${entry.date}/`}>
+              <span>{entry.date}</span>
+              <small>{entry.problems.length} 题</small>
+            </a>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <h2>最近提交</h2>
+        <a href="/problems/">全部题目</a>
+      </div>
+      <div class="list">
+        {
+          recentSubmissions.map((submission) => (
+            <a class="list-row" href={`/problems/${submission.problemId}/`}>
+              <span>{submission.user} / {submission.problemTitle}</span>
+              <small>{submission.date ?? '未归档'}</small>
+            </a>
+          ))
+        }
+      </div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <div class="section-title">
+      <h2>题目概览</h2>
+      <a href="/problems/">查看全部</a>
+    </div>
+    <div class="problem-strip">
+      {
+        data.problems.slice(0, 12).map((problem) => (
+          <a class="problem-chip" href={`/problems/${problem.id}/`}>
+            <span class:list={['difficulty', difficultyClass(problem.difficulty)]}>
+              {difficultyLabel(problem.difficulty)}
+            </span>
+            <strong>{problem.title}</strong>
+            <small>{problem.submissions.length} 次提交</small>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

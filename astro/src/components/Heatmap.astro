@@ -1,0 +1,66 @@
+---
+interface Props {
+  dateCounts: Record<string, number>;
+  endDate: string;
+  scheduledDates?: string[];
+  compact?: boolean;
+}
+
+const { dateCounts, endDate, scheduledDates = [], compact = false } = Astro.props;
+
+const scheduled = new Set(scheduledDates);
+const end = parseDate(endDate);
+const days = compact ? 98 : 371;
+const start = addDays(end, -(days - 1));
+const cells: Array<{ date: string | null; count: number; scheduled: boolean; level: number }> = [];
+
+for (let i = 0; i < start.getDay(); i += 1) {
+  cells.push({ date: null, count: 0, scheduled: false, level: 0 });
+}
+
+for (let i = 0; i < days; i += 1) {
+  const date = toIsoDate(addDays(start, i));
+  const count = dateCounts[date] ?? 0;
+  const isScheduled = scheduled.size === 0 || scheduled.has(date);
+  const level = count >= 3 ? 3 : count;
+  cells.push({ date, count, scheduled: isScheduled, level });
+}
+
+function parseDate(value: string): Date {
+  const [year, month, day] = value.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
+function addDays(date: Date, amount: number): Date {
+  const next = new Date(date);
+  next.setDate(next.getDate() + amount);
+  return next;
+}
+
+function toIsoDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+---
+
+<div class:list={['heatmap', compact && 'heatmap-compact']} aria-label="训练热力图">
+  {
+    cells.map((cell) =>
+      cell.date ? (
+        <span
+          class:list={[
+            'heatmap-cell',
+            `level-${cell.level}`,
+            !cell.scheduled && cell.count === 0 && 'unscheduled'
+          ]}
+          title={`${cell.date}: ${cell.count} 次提交`}
+          aria-label={`${cell.date}: ${cell.count} 次提交`}
+        />
+      ) : (
+        <span class="heatmap-cell blank" aria-hidden="true" />
+      )
+    )
+  }
+</div>

@@ -1,0 +1,106 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { difficultyClass, difficultyLabel, getSiteData } from '../../lib/content';
+
+export function getStaticPaths() {
+  return getSiteData().dailyEntries.map((entry) => ({
+    params: { date: entry.date }
+  }));
+}
+
+const data = getSiteData();
+const entry = data.dailyEntries.find((item) => item.date === Astro.params.date);
+
+if (!entry) {
+  throw new Error(`Unknown daily entry: ${Astro.params.date}`);
+}
+
+const problems = entry.problems
+  .map((id) => data.problems.find((problem) => problem.id === id))
+  .filter(Boolean);
+const daySubmissions = data.submissions.filter((submission) => submission.date === entry.date);
+const users = [...new Set(daySubmissions.map((submission) => submission.user))].sort();
+---
+
+<BaseLayout title={`${entry.date} 每日训练`}>
+  <section class="page-heading">
+    <div>
+      <p class="eyebrow">Daily</p>
+      <h1>{entry.date}</h1>
+    </div>
+    <a class="button-link" href="/daily/">返回每日列表</a>
+  </section>
+
+  <section class="metric-grid" aria-label="当日统计">
+    <div class="metric">
+      <span class="metric-label">题目</span>
+      <strong>{entry.problems.length}</strong>
+    </div>
+    <div class="metric">
+      <span class="metric-label">参与用户</span>
+      <strong>{users.length}</strong>
+    </div>
+    <div class="metric">
+      <span class="metric-label">提交</span>
+      <strong>{daySubmissions.length}</strong>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="section-title">
+      <h2>题目</h2>
+    </div>
+    <div class="problem-strip">
+      {
+        problems.map((problem) => {
+          const submissions = daySubmissions.filter((submission) => submission.problemId === problem.id);
+          return (
+            <a class="problem-chip" href={`/problems/${problem.id}/`}>
+              <span class:list={['difficulty', difficultyClass(problem.difficulty)]}>
+                {difficultyLabel(problem.difficulty)}
+              </span>
+              <strong>{problem.title}</strong>
+              <small>{submissions.length} 次提交</small>
+            </a>
+          );
+        })
+      }
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="section-title">
+      <h2>完成情况</h2>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>用户</th>
+            {problems.map((problem) => <th>{problem.id}</th>)}
+            <th>合计</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            users.map((user) => {
+              const submissions = daySubmissions.filter((submission) => submission.user === user);
+              return (
+                <tr>
+                  <td><a href={`/users/${user}/`}>{user}</a></td>
+                  {
+                    problems.map((problem) => {
+                      const solved = submissions.some((submission) => submission.problemId === problem.id);
+                      return <td>{solved ? '完成' : '-'}</td>;
+                    })
+                  }
+                  <td>{submissions.length}</td>
+                </tr>
+              );
+            })
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</BaseLayout>

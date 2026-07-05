@@ -1,0 +1,141 @@
+---
+import Heatmap from '../../components/Heatmap.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { difficultyClass, difficultyLabel, getSiteData } from '../../lib/content';
+
+export function getStaticPaths() {
+  return getSiteData().userSummaries.map((summary) => ({
+    params: { user: summary.user }
+  }));
+}
+
+const data = getSiteData();
+const summary = data.userSummaries.find((item) => item.user === Astro.params.user);
+
+if (!summary) {
+  throw new Error(`Unknown user: ${Astro.params.user}`);
+}
+
+const difficultyEntries = Object.entries(summary.byDifficulty);
+const tagEntries = Object.entries(summary.byTag);
+---
+
+<BaseLayout title={`${summary.user} 的训练记录`}>
+  <section class="page-heading">
+    <div>
+      <p class="eyebrow">User</p>
+      <h1>{summary.user}</h1>
+    </div>
+    <a class="button-link" href="/">返回总览</a>
+  </section>
+
+  <section class="metric-grid" aria-label="用户统计">
+    <div class="metric">
+      <span class="metric-label">当前连续</span>
+      <strong>{summary.currentStreak}</strong>
+    </div>
+    <div class="metric">
+      <span class="metric-label">最长连续</span>
+      <strong>{summary.longestStreak}</strong>
+    </div>
+    <div class="metric">
+      <span class="metric-label">训练天数</span>
+      <strong>{summary.totalTrainingDays}</strong>
+    </div>
+    <div class="metric">
+      <span class="metric-label">提交</span>
+      <strong>{summary.totalSubmissions}</strong>
+    </div>
+    <div class="metric">
+      <span class="metric-label">可展示题解</span>
+      <strong>{summary.totalDisplaySolutions}</strong>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="section-title">
+      <h2>训练热力图</h2>
+      <span>截至 {data.latestDate}</span>
+    </div>
+    <Heatmap dateCounts={summary.dateCounts} endDate={data.latestDate} scheduledDates={data.scheduledDates} />
+  </section>
+
+  <div class="content-grid">
+    <section class="panel">
+      <div class="section-title">
+        <h2>难度分布</h2>
+      </div>
+      <div class="bars">
+        {
+          difficultyEntries.map(([difficulty, count]) => (
+            <div class="bar-row">
+              <span class:list={['difficulty', difficultyClass(difficulty)]}>{difficultyLabel(difficulty)}</span>
+              <div class="bar-track">
+                <span style={`width: ${(count / Math.max(1, summary.totalSubmissions)) * 100}%`} />
+              </div>
+              <strong>{count}</strong>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <h2>标签分布</h2>
+      </div>
+      <div class="tag-cloud">
+        {tagEntries.map(([tag, count]) => <span>{tag}<small>{count}</small></span>)}
+      </div>
+    </section>
+  </div>
+
+  {
+    summary.profile && (
+      <section class="panel">
+        <div class="section-title">
+          <h2>个人说明</h2>
+        </div>
+        <article class="markdown" set:html={summary.profile.html} />
+      </section>
+    )
+  }
+
+  <section class="panel">
+    <div class="section-title">
+      <h2>提交记录</h2>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>日期</th>
+            <th>题目</th>
+            <th>难度</th>
+            <th>标签</th>
+            <th>可展示</th>
+            <th>记录</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            summary.submissions.map((submission) => (
+              <tr>
+                <td>{submission.date ?? '未归档'}</td>
+                <td><a href={`/problems/${submission.problemId}/`}>{submission.problemTitle}</a></td>
+                <td>
+                  <span class:list={['difficulty', difficultyClass(submission.difficulty)]}>
+                    {difficultyLabel(submission.difficulty)}
+                  </span>
+                </td>
+                <td>{submission.tags.join(', ') || '-'}</td>
+                <td>{submission.displayAsSolution ? '是' : '否'}</td>
+                <td>{submission.record ? <a href={submission.record}>打开</a> : '-'}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</BaseLayout>

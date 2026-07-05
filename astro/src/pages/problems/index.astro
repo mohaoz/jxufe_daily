@@ -1,0 +1,55 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { difficultyClass, difficultyLabel, getSiteData } from '../../lib/content';
+
+const data = getSiteData();
+const problems = data.problems;
+---
+
+<BaseLayout title="题目列表">
+  <section class="page-heading">
+    <div>
+      <p class="eyebrow">Problems</p>
+      <h1>题目列表</h1>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>题目</th>
+            <th>难度</th>
+            <th>标签</th>
+            <th>训练日</th>
+            <th>标准题解</th>
+            <th>提交</th>
+            <th>可展示</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            problems.map((problem) => (
+              <tr>
+                <td><code>{problem.id}</code></td>
+                <td><a href={`/problems/${problem.id}/`}>{problem.title}</a></td>
+                <td>
+                  <span class:list={['difficulty', difficultyClass(problem.difficulty)]}>
+                    {difficultyLabel(problem.difficulty)}
+                  </span>
+                </td>
+                <td>{problem.tags.join(', ') || '-'}</td>
+                <td>{problem.dates.join(', ') || '-'}</td>
+                <td>{problem.std ? <a href={`/users/${problem.std}/`}>{problem.std}</a> : '-'}</td>
+                <td>{problem.submissions.length}</td>
+                <td>{problem.submissions.filter((submission) => submission.displayAsSolution).length}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</BaseLayout>

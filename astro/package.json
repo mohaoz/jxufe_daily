@@ -1,0 +1,24 @@
+{
+  "name": "training-site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "ASTRO_TELEMETRY_DISABLED=1 XDG_CONFIG_HOME=.config astro dev",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 XDG_CONFIG_HOME=.config astro build",
+    "preview": "ASTRO_TELEMETRY_DISABLED=1 XDG_CONFIG_HOME=.config astro preview",
+    "check": "ASTRO_TELEMETRY_DISABLED=1 XDG_CONFIG_HOME=.config astro check"
+  },
+  "dependencies": {
+    "astro": "^5.0.0",
+    "gray-matter": "^4.0.3",
+    "katex": "^0.16.22",
+    "markdown-it": "^14.1.0",
+    "markdown-it-katex": "^2.0.3",
+    "prismjs": "^1.30.0"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "^14.1.2",
+    "@types/prismjs": "^1.26.5"
+  }
+}
