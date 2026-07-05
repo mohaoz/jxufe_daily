@@ -3,7 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { difficultyClass, difficultyLabel, getSiteData } from '../../lib/content';
 import { withBase } from '../../lib/urls';
 import {
-  getSubmissionIssueBody,
+  getSubmissionIssuePrefill,
   getSubmissionIssueTitle,
   getSubmissionIssueUrl,
   siteConfig
@@ -23,7 +23,8 @@ if (!problem) {
 
 const issueUrl = getSubmissionIssueUrl(problem);
 const issueTitle = getSubmissionIssueTitle(problem);
-const issueBody = getSubmissionIssueBody(problem);
+const prefillItems = getSubmissionIssuePrefill(problem);
+const remainingItems = ['用户 ID', '评测记录', '可展示内容'];
 ---
 
 <BaseLayout title={`提交做题记录 / ${problem.title}`}>
@@ -55,15 +56,33 @@ const issueBody = getSubmissionIssueBody(problem);
 
   <section class="panel submit-panel">
     <div class="section-title">
-      <h2>Issue 内容模板</h2>
+      <h2>自动填充</h2>
       {
         siteConfig.github.repository ? (
-          <span>使用 issue 模板提交后由仓库自动化处理</span>
+          <span>打开 GitHub Issue 时带入</span>
         ) : (
-          <span>配置仓库后可直接打开 GitHub issue</span>
+          <span>配置仓库后可直接打开 GitHub Issue</span>
         )
       }
     </div>
-    <textarea class="submission-template" readonly>{issueBody}</textarea>
+    <dl class="prefill-list">
+      {
+        prefillItems.map((item) => (
+          <div>
+            <dt>{item.label}</dt>
+            <dd>{item.value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+
+  <section class="panel submit-panel">
+    <div class="section-title">
+      <h2>还需填写</h2>
+    </div>
+    <div class="tag-cloud">
+      {remainingItems.map((item) => <span>{item}</span>)}
+    </div>
   </section>
 </BaseLayout>

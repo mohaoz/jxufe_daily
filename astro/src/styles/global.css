@@ -410,17 +410,30 @@ tbody tr:hover {
   color: var(--text);
 }
 
-.submission-template {
-  display: block;
-  width: 100%;
-  min-height: 24rem;
-  resize: vertical;
+.prefill-list {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+}
+
+.prefill-list div {
+  display: grid;
+  grid-template-columns: 9rem minmax(0, 1fr);
+  gap: 0.75rem;
   border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #0f172a;
-  padding: 1rem;
-  color: #e5e7eb;
-  font: 0.92rem/1.65 ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  border-radius: 6px;
+  padding: 0.7rem 0.8rem;
+}
+
+.prefill-list dt {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.prefill-list dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-weight: 650;
 }
 
 .bars {

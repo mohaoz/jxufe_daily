@@ -116,5 +116,6 @@ jobs:
               owner,
               repo,
               issue_number: issue.number,
+              title: `[做题记录] [${problem}] [${user}]`,
               state: 'closed'
             });
