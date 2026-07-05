@@ -2,6 +2,7 @@
 import Heatmap from '../../components/Heatmap.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { difficultyClass, difficultyLabel, getSiteData } from '../../lib/content';
+import { withBase } from '../../lib/urls';
 
 export function getStaticPaths() {
   return getSiteData().userSummaries.map((summary) => ({
@@ -26,7 +27,7 @@ const tagEntries = Object.entries(summary.byTag);
       <p class="eyebrow">User</p>
       <h1>{summary.user}</h1>
     </div>
-    <a class="button-link" href="/">返回总览</a>
+    <a class="button-link" href={withBase('/')}>返回总览</a>
   </section>
 
   <section class="metric-grid" aria-label="用户统计">
@@ -122,7 +123,7 @@ const tagEntries = Object.entries(summary.byTag);
             summary.submissions.map((submission) => (
               <tr>
                 <td>{submission.date ?? '未归档'}</td>
-                <td><a href={`/problems/${submission.problemId}/`}>{submission.problemTitle}</a></td>
+                <td><a href={withBase(`/problems/${submission.problemId}/`)}>{submission.problemTitle}</a></td>
                 <td>
                   <span class:list={['difficulty', difficultyClass(submission.difficulty)]}>
                     {difficultyLabel(submission.difficulty)}

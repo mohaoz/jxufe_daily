@@ -2,6 +2,7 @@
 import Heatmap from '../components/Heatmap.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { difficultyClass, difficultyLabel, getSiteData } from '../lib/content';
+import { withBase } from '../lib/urls';
 
 const data = getSiteData();
 const topUsers = data.userSummaries.slice(0, 8);
@@ -63,7 +64,7 @@ const recentSubmissions = [...data.submissions]
           {
             topUsers.map((summary) => (
               <tr>
-                <td><a href={`/users/${summary.user}/`}>{summary.user}</a></td>
+                <td><a href={withBase(`/users/${summary.user}/`)}>{summary.user}</a></td>
                 <td>{summary.currentStreak}</td>
                 <td>{summary.longestStreak}</td>
                 <td>{summary.totalTrainingDays}</td>
@@ -89,12 +90,12 @@ const recentSubmissions = [...data.submissions]
     <section class="panel">
       <div class="section-title">
         <h2>最近训练日</h2>
-        <a href="/daily/">全部日期</a>
+        <a href={withBase('/daily/')}>全部日期</a>
       </div>
       <div class="list">
         {
           recentDaily.map((entry) => (
-            <a class="list-row" href={`/daily/${entry.date}/`}>
+            <a class="list-row" href={withBase(`/daily/${entry.date}/`)}>
               <span>{entry.date}</span>
               <small>{entry.problems.length} 题</small>
             </a>
@@ -106,12 +107,12 @@ const recentSubmissions = [...data.submissions]
     <section class="panel">
       <div class="section-title">
         <h2>最近提交</h2>
-        <a href="/problems/">全部题目</a>
+        <a href={withBase('/problems/')}>全部题目</a>
       </div>
       <div class="list">
         {
           recentSubmissions.map((submission) => (
-            <a class="list-row" href={`/problems/${submission.problemId}/`}>
+            <a class="list-row" href={withBase(`/problems/${submission.problemId}/`)}>
               <span>{submission.user} / {submission.problemTitle}</span>
               <small>{submission.date ?? '未归档'}</small>
             </a>
@@ -124,12 +125,12 @@ const recentSubmissions = [...data.submissions]
   <section class="panel">
     <div class="section-title">
       <h2>题目概览</h2>
-      <a href="/problems/">查看全部</a>
+      <a href={withBase('/problems/')}>查看全部</a>
     </div>
     <div class="problem-strip">
       {
         data.problems.slice(0, 12).map((problem) => (
-          <a class="problem-chip" href={`/problems/${problem.id}/`}>
+          <a class="problem-chip" href={withBase(`/problems/${problem.id}/`)}>
             <span class:list={['difficulty', difficultyClass(problem.difficulty)]}>
               {difficultyLabel(problem.difficulty)}
             </span>

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { difficultyClass, difficultyLabel, getSiteData } from '../../lib/content';
+import { withBase } from '../../lib/urls';
 
 const data = getSiteData();
 const problems = data.problems;
@@ -34,7 +35,7 @@ const problems = data.problems;
             problems.map((problem) => (
               <tr>
                 <td><code>{problem.id}</code></td>
-                <td><a href={`/problems/${problem.id}/`}>{problem.title}</a></td>
+                <td><a href={withBase(`/problems/${problem.id}/`)}>{problem.title}</a></td>
                 <td>
                   <span class:list={['difficulty', difficultyClass(problem.difficulty)]}>
                     {difficultyLabel(problem.difficulty)}
@@ -42,7 +43,7 @@ const problems = data.problems;
                 </td>
                 <td>{problem.tags.join(', ') || '-'}</td>
                 <td>{problem.dates.join(', ') || '-'}</td>
-                <td>{problem.std ? <a href={`/users/${problem.std}/`}>{problem.std}</a> : '-'}</td>
+                <td>{problem.std ? <a href={withBase(`/users/${problem.std}/`)}>{problem.std}</a> : '-'}</td>
                 <td>{problem.submissions.length}</td>
                 <td>{problem.submissions.filter((submission) => submission.displayAsSolution).length}</td>
               </tr>

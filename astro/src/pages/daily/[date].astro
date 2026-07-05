@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { difficultyClass, difficultyLabel, getSiteData } from '../../lib/content';
+import { withBase } from '../../lib/urls';
 
 export function getStaticPaths() {
   return getSiteData().dailyEntries.map((entry) => ({
@@ -28,7 +29,7 @@ const users = [...new Set(daySubmissions.map((submission) => submission.user))].
       <p class="eyebrow">Daily</p>
       <h1>{entry.date}</h1>
     </div>
-    <a class="button-link" href="/daily/">返回每日列表</a>
+    <a class="button-link" href={withBase('/daily/')}>返回每日列表</a>
   </section>
 
   <section class="metric-grid" aria-label="当日统计">
@@ -55,7 +56,7 @@ const users = [...new Set(daySubmissions.map((submission) => submission.user))].
         problems.map((problem) => {
           const submissions = daySubmissions.filter((submission) => submission.problemId === problem.id);
           return (
-            <a class="problem-chip" href={`/problems/${problem.id}/`}>
+            <a class="problem-chip" href={withBase(`/problems/${problem.id}/`)}>
               <span class:list={['difficulty', difficultyClass(problem.difficulty)]}>
                 {difficultyLabel(problem.difficulty)}
               </span>
@@ -87,7 +88,7 @@ const users = [...new Set(daySubmissions.map((submission) => submission.user))].
               const submissions = daySubmissions.filter((submission) => submission.user === user);
               return (
                 <tr>
-                  <td><a href={`/users/${user}/`}>{user}</a></td>
+                  <td><a href={withBase(`/users/${user}/`)}>{user}</a></td>
                   {
                     problems.map((problem) => {
                       const solved = submissions.some((submission) => submission.problemId === problem.id);

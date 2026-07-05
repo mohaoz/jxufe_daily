@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import { siteConfig } from '../site.config';
+import { withBase } from '../lib/urls';
 
 interface Props {
   title?: string;
@@ -13,9 +14,9 @@ const {
 } = Astro.props;
 
 const navItems = [
-  { href: '/', label: '总览' },
-  { href: '/daily/', label: '每日' },
-  { href: '/problems/', label: '题目' }
+  { href: withBase('/'), label: '总览' },
+  { href: withBase('/daily/'), label: '每日' },
+  { href: withBase('/problems/'), label: '题目' }
 ];
 ---
 
@@ -29,7 +30,7 @@ const navItems = [
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href="/">训练记录</a>
+      <a class="brand" href={withBase('/')}>训练记录</a>
       <nav class="site-nav" aria-label="主导航">
         {navItems.map((item) => <a href={item.href}>{item.label}</a>)}
       </nav>

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { difficultyClass, difficultyLabel, getSiteData } from '../../lib/content';
+import { withBase } from '../../lib/urls';
 import {
   getSubmissionIssueBody,
   getSubmissionIssueTitle,
@@ -34,7 +35,7 @@ const issueBody = getSubmissionIssueBody(problem);
     <div class="action-row">
       {issueUrl && <a class="button-link primary" href={issueUrl}>打开 GitHub Issue</a>}
       {problem.submit && <a class="button-link primary" href={problem.submit}>评测入口</a>}
-      <a class="button-link secondary" href={`/problems/${problem.id}/`}>返回题目</a>
+      <a class="button-link secondary" href={withBase(`/problems/${problem.id}/`)}>返回题目</a>
     </div>
   </section>
 

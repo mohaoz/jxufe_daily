@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getSiteData } from '../../lib/content';
+import { withBase } from '../../lib/urls';
 
 const data = getSiteData();
 const entries = [...data.dailyEntries].reverse();
@@ -21,7 +22,7 @@ const entries = [...data.dailyEntries].reverse();
           const submissions = data.submissions.filter((submission) => submission.date === entry.date);
           const users = new Set(submissions.map((submission) => submission.user));
           return (
-            <a class="list-row" href={`/daily/${entry.date}/`}>
+            <a class="list-row" href={withBase(`/daily/${entry.date}/`)}>
               <span>{entry.date}</span>
               <small>{entry.problems.length} 题 / {users.size} 人 / {submissions.length} 次提交</small>
             </a>

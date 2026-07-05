@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { difficultyClass, difficultyLabel, getSiteData } from '../../lib/content';
+import { withBase } from '../../lib/urls';
 import { getSubmissionIssueUrl } from '../../site.config';
 
 export function getStaticPaths() {
@@ -20,7 +21,7 @@ const stdSubmission = problem.std
   ? problem.submissions.find((submission) => submission.user === problem.std)
   : undefined;
 const submissionIssueUrl = getSubmissionIssueUrl(problem);
-const submitRecordUrl = submissionIssueUrl ?? `/submit/${problem.id}/`;
+const submitRecordUrl = submissionIssueUrl ?? withBase(`/submit/${problem.id}/`);
 ---
 
 <BaseLayout title={problem.title}>
@@ -32,15 +33,15 @@ const submitRecordUrl = submissionIssueUrl ?? `/submit/${problem.id}/`;
     <div class="action-row">
       {problem.submit && <a class="button-link primary" href={problem.submit}>评测入口</a>}
       <a class="button-link secondary" href={submitRecordUrl}>提交做题记录</a>
-      <a class="button-link secondary" href="/problems/">返回列表</a>
+      <a class="button-link secondary" href={withBase('/problems/')}>返回列表</a>
     </div>
   </section>
 
   <section class="meta-line">
     <span class:list={['difficulty', difficultyClass(problem.difficulty)]}>{difficultyLabel(problem.difficulty)}</span>
     {problem.tags.map((tag) => <span class="tag">{tag}</span>)}
-    {problem.dates.map((date) => <a class="tag neutral" href={`/daily/${date}/`}>{date}</a>)}
-    {problem.std && <a class="tag neutral" href={`/users/${problem.std}/`}>std: {problem.std}</a>}
+    {problem.dates.map((date) => <a class="tag neutral" href={withBase(`/daily/${date}/`)}>{date}</a>)}
+    {problem.std && <a class="tag neutral" href={withBase(`/users/${problem.std}/`)}>std: {problem.std}</a>}
   </section>
 
   <section class="panel">
@@ -88,7 +89,7 @@ const submitRecordUrl = submissionIssueUrl ?? `/submit/${problem.id}/`;
         problem.submissions.map((submission) => (
           <details class="submission-item">
             <summary class="submission-row">
-              <span><a href={`/users/${submission.user}/`}>{submission.user}</a></span>
+              <span><a href={withBase(`/users/${submission.user}/`)}>{submission.user}</a></span>
               <span class="submission-actions">
                 {submission.record && <a href={submission.record}>提交记录</a>}
                 {submission.displayAsSolution && submission.raw && <span>查看题解</span>}
