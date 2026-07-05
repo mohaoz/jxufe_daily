@@ -1,6 +1,6 @@
 name: 提交做题记录
 description: 提交训练记录和评测记录，可选择是否公开展示为题解
-title: "[做题记录] [题目ID] [用户ID]"
+title: "[做题记录] [题目ID]"
 labels:
   - record
 body:

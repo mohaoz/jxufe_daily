@@ -10,7 +10,7 @@ export const siteConfig = {
 };
 
 export function getSubmissionIssueTitle(problem: Problem): string {
-  return `[做题记录] [${problem.id}] [用户ID]`;
+  return `[做题记录] [${problem.id}]`;
 }
 
 export function getSubmissionIssuePrefill(problem: Problem) {
